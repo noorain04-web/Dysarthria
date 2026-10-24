@@ -32,10 +32,40 @@ hi:{brand:"वाक् अभ्यास • ध्वनि निर्म�
 let lang="en",id="a",rounds=0,running=false,phase=0,interval=null;
 const $=x=>document.getElementById(x);
 function t(){return copy[lang]}
-function renderText(){document.documentElement.lang=lang;document.querySelectorAll("[data-i]").forEach(el=>{let k=el.dataset.i;if(t()[k])el.textContent=t()[k]});$("en").classList.toggle("active",lang==="en");$("hi").classList.toggle("active",lang==="hi");document.querySelectorAll(".item").forEach(el=>{let key=el.dataset.id;el.querySelector("strong").textContent=t()[key+"Title"];el.querySelector("small").textContent=t()[key+"Sub"]});renderActivity()}
-function renderActivity(){const ix=["a","b","c","d","e"].indexOf(id);$("activityTitle").textContent=t().activityNames[ix];$("activityDesc").textContent=t().descs[ix];$("prompt").textContent=t().prompt[ix];$("visualCaption").textContent=t().captions[ix];$("step").textContent=t().round+" "+id.toUpperCase()+" / 5";$("stageLabel").textContent=t().stage;$("status").textContent=t().ready;$("start").textContent=t().start;$("next").textContent=t().next;$("reset").textContent=t().reset;$("progressText").textContent=t().roundCount(rounds);$("roundScore").textContent=t().roundsDone(rounds);$("consistency").textContent=rounds?t().consistencyVal:"—";$("start").disabled=running||rounds>=3;$("next").disabled=running||rounds===0||rounds>=3}
+function renderText(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i]").forEach(el=>{
+    const key=el.dataset.i;
+    if(Object.prototype.hasOwnProperty.call(t(),key)) el.textContent=t()[key];
+  });
+  $("en").classList.toggle("active",lang==="en");
+  $("hi").classList.toggle("active",lang==="hi");
+  renderActivity();
+}
+function renderActivity(){
+  const ix=["a","b","c","d","e"].indexOf(id);
+  $("activityTitle").textContent=t().activityNames[ix];
+  $("activityDesc").textContent=t().descs[ix];
+  $("prompt").textContent=t().prompt[ix];
+  $("visualCaption").textContent=t().captions[ix];
+  $("step").textContent=t().round+" "+id.toUpperCase()+" / 5";
+  $("stageLabel").textContent=t().stage;
+  $("status").textContent=running?t().running:t().ready;
+  $("start").textContent=t().start;
+  $("next").textContent=t().next;
+  $("reset").textContent=t().reset;
+  $("progressText").textContent=t().roundCount(rounds);
+  $("roundScore").textContent=t().roundsDone(rounds);
+  $("consistency").textContent=rounds?t().consistencyVal:"—";
+  $("start").disabled=running||rounds>=3;
+  $("next").disabled=running||rounds===0||rounds>=3;
+  if(!running && rounds===0){
+    $("feedbackTitle").textContent=t().readyFeedback;
+    $("feedbackText").textContent=t().readyText;
+  }
+}
 function begin(){if(running||rounds>=3)return;running=true;phase=0;$("status").textContent=t().running;$("start").disabled=true;$("next").disabled=true;$("feedbackTitle").textContent=t().running;$("feedbackText").textContent=t().readyText;let total= id==="c"?4:5,step=0;$("timer").textContent="00:0"+total;$ ("progress").style.width="0%";interval=setInterval(()=>{step++;$("timer").textContent="00:0"+Math.max(0,total-step);$("progress").style.width=Math.min(100,step/total*100)+"%";if(id==="c"){$("prompt").textContent=step<2?t().hold:t().go}else if(id==="e"){$("prompt").textContent=step<3?t().neutral:t().turn}else{$("prompt").textContent=step<2?t().prompt[["a","b","c","d","e"].indexOf(id)]:t().go}if(step>=total){clearInterval(interval);running=false;rounds++;$("status").textContent=t().complete;$("feedbackTitle").textContent=t().complete;$ ("feedbackText").textContent=t().completeText;$ ("prompt").textContent=t().captions[["a","b","c","d","e"].indexOf(id)];renderActivity();if(rounds>=3){$("feedbackTitle").textContent=t().finish;$("feedbackText").textContent=t().finishText}}},1000)}
 function reset(){clearInterval(interval);running=false;rounds=0;$ ("timer").textContent="00:00";$("progress").style.width="0%";$("feedbackTitle").textContent=t().readyFeedback;$("feedbackText").textContent=t().readyText;renderActivity()}
 document.querySelectorAll(".item").forEach(el=>el.addEventListener("click",()=>{clearInterval(interval);running=false;id=el.dataset.id;rounds=0;document.querySelectorAll(".item").forEach(x=>x.classList.toggle("selected",x===el));$("timer").textContent="00:00";$("progress").style.width="0%";$("feedbackTitle").textContent=t().readyFeedback;$("feedbackText").textContent=t().readyText;renderActivity()}));
-$("en").onclick=()=>{lang="en";renderText()};$("hi").onclick=()=>{lang="hi";renderText()};$("start").onclick=begin;$("next").onclick=begin;$("reset").onclick=reset;renderText();
+$("en").addEventListener("click",()=>{lang="en";renderText()});$("hi").addEventListener("click",()=>{lang="hi";renderText()});$("start").onclick=begin;$("next").onclick=begin;$("reset").onclick=reset;renderText();
 </script></body></html>
